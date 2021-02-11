@@ -8,7 +8,7 @@ import android.util.Log
  */
 
 object Logger: ILogger {
-    const val TAG = "byh"
+    const val TAG = "BuildYourHome"
 
     private val _logger: ILogger
         get() = loggerImpl?: localLogger
