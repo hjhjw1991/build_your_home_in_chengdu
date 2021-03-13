@@ -1,16 +1,14 @@
-plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-}
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply from: rootProject.file('ext.gradle')
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    compileSdkVersion compile_sdk_version
 
     defaultConfig {
         applicationId "com.hjhjw1991.barney.byh"
-        minSdkVersion 24
-        targetSdkVersion 30
+        minSdkVersion min_sdk_version
+        targetSdkVersion target_sdk_version
         versionCode 1
         versionName "1.0"
 
