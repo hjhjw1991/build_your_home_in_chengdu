@@ -5,7 +5,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="2dp">
+    android:paddingTop="0dp">
 
     <fragment
         android:id="@+id/nav_host_fragment_activity_main"
@@ -14,6 +14,15 @@
         android:layout_height="match_parent"
         app:defaultNavHost="true"
         tools:layout_editor_absoluteY="56dp" />
+
+    <com.hjhjw1991.barney.BarneyLoadingView
+        android:id="@+id/bar_percent_progress"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        app:barIsGradient="true"
+        app:barProgressColor="@color/black_3A3D4E"
+        app:barBgColor="@color/gray_color2"
+        app:layout_constraintBottom_toTopOf="@id/nav_view" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_view"
