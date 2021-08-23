@@ -49,7 +49,9 @@
 ## 实操流程
 
 等买了再来记录
-TBD
+
+--- 3月上车了, 记录一下 ---
+
 
 
 [fangxiaotuan]: pic/fangxiaotuan_wx_cd.png
