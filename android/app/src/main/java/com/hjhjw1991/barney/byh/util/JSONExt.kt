@@ -17,3 +17,10 @@ fun JSONObject.toMap(): Map<String, Any> {
     // todo convert json to map
     return mutableMapOf()
 }
+
+infix fun JSONObject.merge(other: JSONObject): JSONObject {
+    for(key in other.keys()) {
+        this.put(key, other.get(key))
+    }
+    return this
+}
