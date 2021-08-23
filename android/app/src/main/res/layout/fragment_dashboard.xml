@@ -5,6 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.dashboard.DashboardFragment">
+    <ProgressBar
+        android:id="@+id/byh_progress_horizontal"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dip"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@android:id/progress_circular"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_centerVertical="true"
+        android:visibility="gone"
+        android:max="100" />
 
     <com.hjhjw1991.barney.byh.ui.BarneyWebView
         android:id="@+id/dashboard_webview"
