@@ -16,7 +16,9 @@ import com.hjhjw1991.barney.byh.ui.dashboard.DashboardFragment
 import com.hjhjw1991.barney.byh.ui.home.HomeFragment
 import com.hjhjw1991.barney.byh.ui.notifications.NotificationsFragment
 
-
+/**
+ * 主入口
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding

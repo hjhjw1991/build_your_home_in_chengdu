@@ -11,6 +11,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.hjhjw1991.barney.byh.R
 import com.hjhjw1991.barney.byh.databinding.FragmentNotificationsBinding
 
+/**
+ * 消息页
+ */
 class NotificationsFragment : Fragment() {
 
     private lateinit var notificationsViewModel: NotificationsViewModel

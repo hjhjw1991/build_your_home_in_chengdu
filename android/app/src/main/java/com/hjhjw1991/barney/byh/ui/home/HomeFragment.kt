@@ -1,4 +1,4 @@
-package com.hjhjw1991.barney.byh.ui.dashboard
+package com.hjhjw1991.barney.byh.ui.home
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,16 +12,22 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.hjhjw1991.barney.BarneyLoadingView
 import com.hjhjw1991.barney.byh.R
-import com.hjhjw1991.barney.byh.databinding.FragmentDashboardBinding
+import com.hjhjw1991.barney.byh.databinding.FragmentHomeBinding
 import com.hjhjw1991.barney.byh.ui.BarneyWebView
 import com.hjhjw1991.barney.byh.util.Logger
 import com.hjhjw1991.barney.byh.util.ToastUtil
 import com.hjhjw1991.barney.byh.util.removeSelfFromParent
 
-class DashboardFragment : Fragment() {
+/**
+ * 主页
+ */
+class HomeFragment : Fragment() {
+    init {
+        Logger.log("init")
+    }
 
-    private lateinit var dashboardViewModel: DashboardViewModel
-    private var _binding: FragmentDashboardBinding? = null
+    private lateinit var homeViewModel: HomeViewModel
+    private var _binding: FragmentHomeBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -30,16 +36,22 @@ class DashboardFragment : Fragment() {
     var contentView: BarneyWebView? = null
     var rootView: View? = null
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Logger.log("onCreate HomeFragment")
+    }
+
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        dashboardViewModel =
-                ViewModelProvider(this).get(DashboardViewModel::class.java)
+
+        homeViewModel =
+            ViewModelProvider(this).get(HomeViewModel::class.java)
 
         if (rootView == null) {
-            _binding = FragmentDashboardBinding.inflate(inflater, container, false)
+            _binding = FragmentHomeBinding.inflate(inflater, container, false)
             // every time it creates a new view
             rootView = binding.root
             Logger.log("create $rootView")
@@ -49,7 +61,7 @@ class DashboardFragment : Fragment() {
         }
 
         if (contentView == null) {
-            val innerWeb: BarneyWebView = binding.dashboardWebview
+            val innerWeb: BarneyWebView = binding.homeWebview
             Logger.log("onCreateView $innerWeb")
             innerWeb.webChromeClient = object : WebChromeClient() {
                 val progress = (container?.parent as? ViewGroup)?.findViewById<BarneyLoadingView>(R.id.bar_percent_progress)
@@ -58,7 +70,7 @@ class DashboardFragment : Fragment() {
                     progress?.setPercentage(newProgress.toFloat())
                 }
             }
-            dashboardViewModel.url.observe(viewLifecycleOwner, {
+            homeViewModel.url.observe(viewLifecycleOwner, Observer {
 //                context?.run { ToastUtil.show(this, "loading $it") }
                 if (innerWeb.url != it) {
                     Logger.log("loading url=$it replace ${innerWeb.url}")
@@ -80,7 +92,7 @@ class DashboardFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        Logger.log("onDestroy DashboardFragment")
+        Logger.log("onDestroy HomeFragment")
         super.onDestroy()
     }
 }
