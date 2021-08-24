@@ -51,8 +51,10 @@ class DashboardFragment : Fragment() {
         if (contentView == null) {
             val innerWeb: BarneyWebView = binding.dashboardWebview
             Logger.log("onCreateView $innerWeb")
-            innerWeb.webChromeClient = object : WebChromeClient() {
-                val progress = (container?.parent as? ViewGroup)?.findViewById<BarneyLoadingView>(R.id.bar_percent_progress)
+            innerWeb.addWebChromeClient(object : WebChromeClient() {
+                val progress =
+                    (container?.parent as? ViewGroup)?.findViewById<BarneyLoadingView>(R.id.bar_percent_progress)
+
                 override fun onProgressChanged(view: WebView?, newProgress: Int) {
                     super.onProgressChanged(view, newProgress)
                     progress?.setPercentage(newProgress.toFloat())
@@ -62,7 +64,7 @@ class DashboardFragment : Fragment() {
                         progress?.visibility = View.VISIBLE
                     }
                 }
-            }
+            })
             dashboardViewModel.url.observe(viewLifecycleOwner, {
 //                context?.run { ToastUtil.show(this, "loading $it") }
                 if (innerWeb.url != it) {

@@ -18,7 +18,7 @@
     <com.hjhjw1991.barney.ui.BarneyLoadingView
         android:id="@+id/bar_percent_progress"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="3dp"
         app:barHeight="3dp"
         app:barIsGradient="true"
         app:barStartColor="@color/green_color2"
