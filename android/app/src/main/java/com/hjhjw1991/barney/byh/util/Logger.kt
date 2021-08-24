@@ -7,6 +7,11 @@ import android.util.Log
  * @since 2021/2/6
  */
 
+interface ILogger {
+    fun log(str: String?)
+    fun log(tag: String, str: String?)
+}
+
 object Logger: ILogger {
     const val TAG = "BuildYourHome"
 
@@ -36,9 +41,4 @@ object Logger: ILogger {
     fun setLogger(log: ILogger) {
         loggerImpl = log
     }
-}
-
-interface ILogger {
-    fun log(str: String?)
-    fun log(tag: String, str: String?)
 }

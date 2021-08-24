@@ -3,8 +3,14 @@
 buildscript {
     apply from: rootProject.file('ext.gradle')
     repositories {
-        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-        maven{ url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
+        maven {
+            url 'http://maven.aliyun.com/nexus/content/groups/public/'
+            allowInsecureProtocol true
+        }
+        maven {
+            url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'
+            allowInsecureProtocol true
+        }
 
         google()
         jcenter()
@@ -21,8 +27,14 @@ buildscript {
 allprojects {
     repositories {
         def REPOSITORY_URL = 'http://maven.aliyun.com/nexus/content/groups/public/'
-        maven{ url REPOSITORY_URL}
-        maven{ url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
+        maven {
+            url REPOSITORY_URL
+            allowInsecureProtocol true
+        }
+        maven {
+            url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'
+            allowInsecureProtocol true
+        }
 
         google()
         jcenter()

@@ -68,6 +68,11 @@ class HomeFragment : Fragment() {
                 override fun onProgressChanged(view: WebView?, newProgress: Int) {
                     super.onProgressChanged(view, newProgress)
                     progress?.setPercentage(newProgress.toFloat())
+                    if (newProgress >= 100) {
+                        progress?.visibility = View.GONE
+                    } else if (progress?.visibility == View.GONE) {
+                        progress?.visibility = View.VISIBLE
+                    }
                 }
             }
             homeViewModel.url.observe(viewLifecycleOwner, Observer {

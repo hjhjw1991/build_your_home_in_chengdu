@@ -5,4 +5,8 @@
     <color name="black_3A3D4E">#3A3D4E</color>
     <color name="black_475B80">#475B80</color>
     <color name="gray_color2">#D3D3D3</color>
+    <color name="green_color">#16982B</color>
+    <color name="green_color2">#AEE1CD</color>
+    <!-- 薄荷绿 -->
+    <color name="green_color3">#BDFCC9</color>
 </resources>

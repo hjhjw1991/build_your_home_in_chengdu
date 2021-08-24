@@ -78,7 +78,8 @@ class BarneyLoadingView: View {
             if (heightSpecMode == MeasureSpec.AT_MOST || heightSpecMode == MeasureSpec.UNSPECIFIED) {
                 heightSpecSize
             } else {
-                getContext().getResources().getDimensionPixelSize(R.dimen._10dp)
+                // fixme 跟随自定义属性的高度
+                getContext().getResources().getDimensionPixelSize(R.dimen._1dp)
             }
         setMeasuredDimension(mWidth, mHeight)
     }
