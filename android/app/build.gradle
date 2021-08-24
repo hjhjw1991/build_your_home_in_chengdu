@@ -11,4 +11,7 @@ android {
 
 dependencies {
     implementation project(":commonlib")
+    implementation project(":serviceprovider")
+    implementation project(":serviceprovider-impl")
+    implementation project(":serviceprovider-annotation")
 }

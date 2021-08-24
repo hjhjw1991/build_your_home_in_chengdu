@@ -1,0 +1,11 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply from: rootProject.file('gradle/dependency/commonlib.gradle')
+
+android {
+}
+
+dependencies {
+    implementation project(":serviceprovider-annotation")
+}
+// todo 服务注解处理
