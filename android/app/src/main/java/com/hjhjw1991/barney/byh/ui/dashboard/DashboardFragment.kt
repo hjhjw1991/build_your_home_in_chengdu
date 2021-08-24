@@ -6,16 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebView
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.hjhjw1991.barney.BarneyLoadingView
+import com.hjhjw1991.barney.ui.BarneyLoadingView
 import com.hjhjw1991.barney.byh.R
 import com.hjhjw1991.barney.byh.databinding.FragmentDashboardBinding
 import com.hjhjw1991.barney.byh.ui.BarneyWebView
 import com.hjhjw1991.barney.byh.util.Logger
-import com.hjhjw1991.barney.byh.util.ToastUtil
 import com.hjhjw1991.barney.byh.util.removeSelfFromParent
 
 /**

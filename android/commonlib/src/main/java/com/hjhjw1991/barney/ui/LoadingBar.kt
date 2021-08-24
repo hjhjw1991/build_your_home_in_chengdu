@@ -1,4 +1,4 @@
-package com.hjhjw1991.barney
+package com.hjhjw1991.barney.ui
 
 import android.content.Context
 import android.content.res.TypedArray
@@ -6,6 +6,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.Keep
+import com.hjhjw1991.barney.R
 
 class BarneyLoadingView: View {
     private lateinit var rectFBg: RectF
@@ -16,6 +17,7 @@ class BarneyLoadingView: View {
     private var bgColor = 0
     private var progressColor = 0
     private var mHeight = 0
+    private var mFixedHeight = 0
     private var radius = 0
     private var startColor = 0
     private var endColor = 0
@@ -38,7 +40,7 @@ class BarneyLoadingView: View {
             R.styleable.BarneyLoadingView_barProgressColor,
             resources.getColor(R.color.orange_ffc032)
         )
-        mHeight = typedArray.getDimensionPixelSize(
+        mFixedHeight = typedArray.getDimensionPixelSize(
             R.styleable.BarneyLoadingView_barHeight,
             context.resources.getDimensionPixelSize(R.dimen._10dp)
         )
@@ -78,8 +80,7 @@ class BarneyLoadingView: View {
             if (heightSpecMode == MeasureSpec.AT_MOST || heightSpecMode == MeasureSpec.UNSPECIFIED) {
                 heightSpecSize
             } else {
-                // fixme 跟随自定义属性的高度
-                getContext().getResources().getDimensionPixelSize(R.dimen._1dp)
+                mFixedHeight
             }
         setMeasuredDimension(mWidth, mHeight)
     }
