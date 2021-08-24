@@ -8,7 +8,8 @@ import android.view.ViewGroup
  * @since 2021/2/6
  */
 
-
 fun View.removeSelfFromParent() {
     (this.parent as? ViewGroup)?.removeView(this)
 }
+
+fun CharSequence.isNotNullOrEmpty(): Boolean = !isNullOrEmpty()
