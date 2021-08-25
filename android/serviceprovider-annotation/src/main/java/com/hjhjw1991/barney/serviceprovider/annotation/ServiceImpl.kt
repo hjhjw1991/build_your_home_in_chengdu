@@ -8,4 +8,4 @@ import kotlin.reflect.KClass
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class ServiceImpl(val service: Array<KClass<*>>, val singleton: Boolean)
+annotation class ServiceImpl(val service: Array<KClass<*>>, val singleton: Boolean = true)

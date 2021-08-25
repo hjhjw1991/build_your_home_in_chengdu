@@ -15,6 +15,7 @@ import com.hjhjw1991.barney.byh.nav.FixFragmentNavigator
 import com.hjhjw1991.barney.byh.ui.dashboard.DashboardFragment
 import com.hjhjw1991.barney.byh.ui.home.HomeFragment
 import com.hjhjw1991.barney.byh.ui.notifications.NotificationsFragment
+import com.hjhjw1991.barney.serviceprovider.ServiceManager
 
 /**
  * 主入口
@@ -54,6 +55,8 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        ServiceManager.getService(IDemoService::class.java)?.sayHello(this)
     }
 
     //手动创建导航图，把3个目的地添加进来

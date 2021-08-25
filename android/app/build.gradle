@@ -14,4 +14,5 @@ dependencies {
     implementation project(":serviceprovider")
     implementation project(":serviceprovider-impl")
     implementation project(":serviceprovider-annotation")
+    kapt project(":serviceprovider-annotation")
 }
