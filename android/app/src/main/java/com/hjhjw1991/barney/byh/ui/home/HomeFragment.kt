@@ -13,8 +13,8 @@ import com.hjhjw1991.barney.ui.BarneyLoadingView
 import com.hjhjw1991.barney.byh.R
 import com.hjhjw1991.barney.byh.databinding.FragmentHomeBinding
 import com.hjhjw1991.barney.byh.ui.BarneyWebView
-import com.hjhjw1991.barney.byh.util.Logger
-import com.hjhjw1991.barney.byh.util.removeSelfFromParent
+import com.hjhjw1991.barney.util.Logger
+import com.hjhjw1991.barney.util.removeSelfFromParent
 
 /**
  * 主页
@@ -67,11 +67,12 @@ class HomeFragment : Fragment() {
 
                 override fun onProgressChanged(view: WebView?, newProgress: Int) {
                     super.onProgressChanged(view, newProgress)
-                    progress?.setPercentage(newProgress.toFloat())
+                    checkNotNull(progress)
+                    progress.setPercentage(newProgress.toFloat())
                     if (newProgress >= 100) {
-                        progress?.visibility = View.GONE
-                    } else if (progress?.visibility == View.GONE) {
-                        progress?.visibility = View.VISIBLE
+                        progress.visibility = View.GONE
+                    } else if (progress.visibility == View.GONE) {
+                        progress.visibility = View.VISIBLE
                     }
                 }
             })

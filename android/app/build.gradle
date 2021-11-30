@@ -6,13 +6,82 @@ apply from: rootProject.file('gradle/dependency/commonlib.gradle')
 android {
     defaultConfig {
         applicationId "com.hjhjw1991.barney.byh"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [MODULE_NAME: "module is " + project.name]
+            }
+        }
     }
 }
 
 dependencies {
     implementation project(":commonlib")
     implementation project(":serviceprovider")
-    implementation project(":serviceprovider-impl")
     implementation project(":serviceprovider-annotation")
     kapt project(":serviceprovider-annotation")
+}
+
+project.afterEvaluate {
+    createOutputDepsTask()
+}
+
+// 创建输出依赖的任务, 可手动运行
+def createOutputDepsTask() {
+    project.android.applicationVariants.all { variant ->
+        tasks.create(name: "showDeps${variant.name.capitalize()}",
+                description: "show dependencies") {
+            doLast {
+                def dir = new File(project.buildDir, "outputs/logs")
+                if (!dir.exists()) {
+                    dir.mkdirs()
+                }
+                File file = new File(dir, "${variant.name}-versions.txt")
+                if (file.exists()) {
+                    file.delete()
+                    file.createNewFile()
+                }
+                var jsonOutput = "---- dependencies ----"
+                jsonOutput += "\n"
+                jsonOutput += "["
+
+                println("---start---")
+
+                Configuration configuration
+                try {
+                    configuration = project.configurations."${variant.name}RuntimeClasspath"
+                    println(configuration)
+                    configuration.resolvedConfiguration.lenientConfiguration.allModuleDependencies.each {dep ->
+                        def identifier = dep.module.id
+                        println("found ${identifier.group}:${identifier.name}:${identifier.version}")
+                        def addToJson
+                        addToJson = { resolvedDep ->
+                            def id = resolvedDep.module.id
+                            jsonOutput += "\n{"
+                            jsonOutput += "\"groupId\":\"${id.group}\",\"artifactId\":\"${id.name}\",\"version\":\"${id.version}\""
+                            jsonOutput += ",\"dependencies\":["
+                            if(resolvedDep.children.size() != 0){
+                                resolvedDep.children.each { childResolvedDep ->
+                                    // don't record runtime
+                                    if(resolvedDep in childResolvedDep.getParents() && childResolvedDep.getConfiguration() == 'compile'){
+                                        addToJson(childResolvedDep)
+                                    }
+                                }
+                                if(jsonOutput[-1] == ','){
+                                    jsonOutput = jsonOutput[0..-2]
+                                }
+                            }
+                            jsonOutput += "]},"
+                        }
+                        addToJson(dep)
+                    }
+                } catch (Exception e) {
+                    println("Error Occured!!")
+                    println(e)
+                }
+                jsonOutput += "\n]"
+                file.text = jsonOutput
+                println("---end---")
+            }
+        }
+    }
 }

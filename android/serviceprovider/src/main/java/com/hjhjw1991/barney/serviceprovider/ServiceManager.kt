@@ -1,15 +1,17 @@
 package com.hjhjw1991.barney.serviceprovider
 
+import java.util.concurrent.ConcurrentHashMap
+
 object ServiceManager {
-    var serviceMap: MutableMap<Class<*>, Any> = mutableMapOf()
-    var servicesMap: MutableMap<Class<*>, List<*>> = mutableMapOf()
+    var serviceMap: ConcurrentHashMap<Class<*>, Any> = ConcurrentHashMap()
+    var servicesMap: ConcurrentHashMap<Class<*>, Set<*>> = ConcurrentHashMap()
 
     fun <T> getService(clazz: Class<out T>): T? {
         return serviceMap[clazz] as? T
     }
 
-    fun <T> getServices(clazz: Class<out T>): List<T>? {
-        return servicesMap[clazz] as? List<T>
+    fun <T> getServices(clazz: Class<out T>): Set<T>? {
+        return servicesMap[clazz] as? Set<T>
     }
 
     fun <T> bindService(clazz: Class<in T>, instance: T) {

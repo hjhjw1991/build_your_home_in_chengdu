@@ -2,7 +2,7 @@ package com.hjhjw1991.barney.byh
 
 import android.app.Application
 import android.content.Context
-import com.hjhjw1991.barney.byh.util.showToast
+import com.hjhjw1991.barney.util.showToast
 import com.hjhjw1991.barney.serviceprovider.ServiceManager
 import com.hjhjw1991.barney.serviceprovider.annotation.ServiceImpl
 import com.hjhjw1991.barney.serviceprovider.annotation.ServiceInterface

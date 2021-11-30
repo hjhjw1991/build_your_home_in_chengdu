@@ -1,4 +1,4 @@
-package com.hjhjw1991.barney.byh.util
+package com.hjhjw1991.barney.util
 
 import android.view.View
 import android.view.ViewGroup

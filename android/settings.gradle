@@ -1,6 +1,5 @@
-include ':commonlib'
 rootProject.name = "BuildYourHome"
+include ':commonlib'
 include ':app'
 include ':serviceprovider'
-include ':serviceprovider-impl'
 include ':serviceprovider-annotation'

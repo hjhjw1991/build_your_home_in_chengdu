@@ -6,6 +6,7 @@ android {
 }
 
 dependencies {
-    implementation project(":serviceprovider-annotation")
 }
-// todo 服务注解处理
+// todo 服务发现, 服务注册
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"

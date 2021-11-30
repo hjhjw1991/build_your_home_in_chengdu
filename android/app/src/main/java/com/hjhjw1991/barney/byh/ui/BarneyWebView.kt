@@ -6,7 +6,7 @@ import android.net.http.SslError
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.webkit.*
-import com.hjhjw1991.barney.byh.util.showToast
+import com.hjhjw1991.barney.util.showToast
 
 /**
  * Hybrid容器, 提供跨端页面访问和基础封装
