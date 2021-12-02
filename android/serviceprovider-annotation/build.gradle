@@ -3,6 +3,7 @@ apply plugin: 'kotlin'
 apply plugin: 'kotlin-kapt'
 
 dependencies {
+    implementation "com.squareup:javapoet:1.13.0"
 }
 
 // todo 服务注解处理
