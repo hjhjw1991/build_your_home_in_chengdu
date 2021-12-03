@@ -1,7 +1,9 @@
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
 package com.hjhjw1991.barney.serviceprovider.annotation
 
 import com.hjhjw1991.barney.serviceprovider.annotation.ServiceProcessor.Companion.SERVICE_IMPL
 import com.hjhjw1991.barney.serviceprovider.annotation.ServiceProcessor.Companion.SERVICE_SPI
+import com.sun.tools.javac.code.Type
 import java.io.IOException
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
@@ -17,6 +19,7 @@ class ServiceProcessor: AbstractProcessor() {
         const val SERVICE_SPI = "com.hjhjw1991.barney.serviceprovider.annotation.ServiceInterface"
         const val SERVICE_IMPL = "com.hjhjw1991.barney.serviceprovider.annotation.ServiceImpl"
         const val SERVICE_PROXY = "ServiceManager_Proxy"
+        val serviceMapConfig = mutableMapOf<String, MutableSet<String>>()
     }
 
     override fun process(
@@ -31,23 +34,34 @@ class ServiceProcessor: AbstractProcessor() {
         println("process begin !!! set = $annotations")
 
         roundEnv.getElementsAnnotatedWith(ServiceInterface::class.java)
-            .filter { it is TypeElement }
-            .map { it as TypeElement }
-            .forEach {
+            .filterIsInstance<TypeElement>()
+            .forEach { element ->
+                println("process find interface = $element")
+                serviceMapConfig[element.qualifiedName.toString()] = mutableSetOf()
+            }
+        roundEnv.getElementsAnnotatedWith(ServiceImpl::class.java)
+            .filterIsInstance<TypeElement>()
+            .forEach { element ->
 //                val treePath = trees.getPath(it)
 //                val cu = treePath.compilationUnit as JCTree.JCCompilationUnit
 //                rootTree = cu
 //                println("process find class = $it, jcTree = ${cu.javaClass.simpleName}")
-                println("process find class = $it")
-                translate(it)
+                println("process find class = $element")
+                element.interfaces.filterIsInstance<Type>()
+                    .find { it.tsym.qualifiedName.toString() in serviceMapConfig }
+                    ?.let {
+                    serviceMapConfig[it.tsym.qualifiedName.toString()]?.add(element.qualifiedName.toString())
+                }
+                translate(element)
 
                 try {
-                    generateJavaFile(it)
+                    generateJavaFile(element)
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
             }
 
+        println(serviceMapConfig)
         println("process end !!!")
         return true
     }

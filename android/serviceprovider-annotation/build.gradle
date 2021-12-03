@@ -6,6 +6,25 @@ dependencies {
     implementation "com.squareup:javapoet:1.13.0"
 }
 
+tasks.withType(JavaCompile) {
+    // Java9开始有了模块概念, tools.jar在9以上被移除了, 并放入了jdk.compiler模块里, 未导出
+    // 因此需要先导出才能使用
+    // 很遗憾kotlin还没支持这样的编译选项, 因此这种方式只能适用于Java模块.
+    // 幸运的是在这里我找到一种解法, https://dev.to/h3xstream/how-to-solve-symbol-is-declared-in-module-x-which-does-not-export-package-y-303g
+    // 通过在文件头标记Suppress的方式, 阻止"模块未导出"的警告
+//    options.compilerArgs += ["--add-exports", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED"]
+}
+
+afterEvaluate {
+    compileJava {
+        options.with {
+            fork = true // 未支持的编译参数, 需要fork出来才能传入
+            forkOptions.executable = "javac"
+            compilerArgs += ["--add-exports", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED"]
+        }
+    }
+}
+
 // todo 服务注解处理
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
+sourceCompatibility = "8"
+targetCompatibility = "8"
