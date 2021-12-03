@@ -3,13 +3,11 @@ package com.hjhjw1991.barney.serviceprovider.annotation
 
 import com.hjhjw1991.barney.serviceprovider.annotation.ServiceProcessor.Companion.SERVICE_IMPL
 import com.hjhjw1991.barney.serviceprovider.annotation.ServiceProcessor.Companion.SERVICE_SPI
-import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.JavaFile
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.TypeSpec
+import com.squareup.javapoet.*
 import com.sun.source.tree.Tree
 import com.sun.source.util.Trees
 import com.sun.tools.javac.code.Flags
+import com.sun.tools.javac.code.Symbol
 import com.sun.tools.javac.code.Type
 import com.sun.tools.javac.code.Types
 import com.sun.tools.javac.processing.JavacProcessingEnvironment
@@ -33,7 +31,7 @@ class ServiceProcessor: AbstractProcessor() {
         const val SERVICE_SPI = "com.hjhjw1991.barney.serviceprovider.annotation.ServiceInterface"
         const val SERVICE_IMPL = "com.hjhjw1991.barney.serviceprovider.annotation.ServiceImpl"
         const val SERVICE_PROXY = "ServiceManager_Proxy"
-        val serviceMapConfig = mutableMapOf<String, MutableSet<String>>()
+        val serviceMapConfig = mutableMapOf<Type, MutableSet<String>>()
     }
     // apt 相关类
     protected val filer: Filer get() = EnvUtil.filer
@@ -64,7 +62,7 @@ class ServiceProcessor: AbstractProcessor() {
             .filterIsInstance<TypeElement>()
             .forEach { element ->
                 println("process find interface = $element")
-                serviceMapConfig[element.qualifiedName.toString()] = mutableSetOf()
+                serviceMapConfig[(element as Symbol).type] = mutableSetOf()
             }
         roundEnv.getElementsAnnotatedWith(ServiceImpl::class.java)
             .filterIsInstance<TypeElement>()
@@ -74,9 +72,9 @@ class ServiceProcessor: AbstractProcessor() {
                 rootTree = cu
                 println("process find class = $element, jcTree = ${cu.javaClass.simpleName}")
                 element.interfaces.filterIsInstance<Type>()
-                    .find { it.tsym.qualifiedName.toString() in serviceMapConfig }
+                    .find { it in serviceMapConfig }
                     ?.let {
-                    serviceMapConfig[it.tsym.qualifiedName.toString()]?.add(element.qualifiedName.toString())
+                    serviceMapConfig[it]?.add(element.qualifiedName.toString())
                 }
                 translate(element, trees.getTree(element) as JCTree)
 
@@ -101,6 +99,7 @@ class ServiceProcessor: AbstractProcessor() {
     fun generateJavaFile(curElement: TypeElement, curTree: JCTree) {
         println("generateJavaFile")
         getJavaFile(curElement).writeTo(filer)
+        getJavaFileByJavaPoet(curElement, curTree)
     }
 
     fun getJavaFile(curElement: TypeElement): JavaFile {
@@ -122,6 +121,26 @@ class ServiceProcessor: AbstractProcessor() {
 
         return JavaFile.builder(packageName, curIGetter)
             .build()
+    }
+
+    // get generated class in app/build/intermediates/javac/package_name/
+    fun getJavaFileByJavaPoet(curElement: TypeElement, curTree: JCTree) {
+        val packageName = rootTree?.packageName?.toString() ?: ""
+        val init = MethodSpec.methodBuilder("init")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .returns(TypeName.VOID)
+            .addStatement("\$T.out.println(\$S)", System::class.java, curElement.simpleName)
+            .build()
+        val proxy = TypeSpec.classBuilder(SERVICE_PROXY)
+            .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+            .addMethod(init)
+            .build()
+        val javaFile = JavaFile.builder(packageName, proxy).build()
+        try {
+            javaFile.writeTo(filer)
+        } catch (th: Throwable) {
+            th.printStackTrace()
+        }
     }
 
     override fun getSupportedOptions(): MutableSet<String> {

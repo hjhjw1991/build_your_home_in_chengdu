@@ -9,6 +9,10 @@ object ConfigCenter {
 
     private var configMap = mutableMapOf<String, MutableSet<String>>()
 
+    init {
+
+    }
+
     fun getConfig(name: String): Set<String> {
         return configMap[name].orEmpty()
     }
