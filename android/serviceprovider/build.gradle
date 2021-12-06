@@ -1,0 +1,12 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply from: rootProject.file('gradle/dependency/commonlib.gradle')
+
+android {
+}
+
+dependencies {
+}
+// todo 服务发现, 服务注册
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"

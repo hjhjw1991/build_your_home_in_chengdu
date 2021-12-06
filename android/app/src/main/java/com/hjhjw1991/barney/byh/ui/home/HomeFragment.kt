@@ -4,14 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebChromeClient
+import android.webkit.WebView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.hjhjw1991.barney.ui.BarneyLoadingView
+import com.hjhjw1991.barney.byh.R
 import com.hjhjw1991.barney.byh.databinding.FragmentHomeBinding
 import com.hjhjw1991.barney.byh.ui.BarneyWebView
-import com.hjhjw1991.barney.byh.util.Logger
-import com.hjhjw1991.barney.byh.util.ToastUtil
-import com.hjhjw1991.barney.byh.util.removeSelfFromParent
+import com.hjhjw1991.barney.util.Logger
+import com.hjhjw1991.barney.util.removeSelfFromParent
 
 /**
  * 主页
@@ -56,16 +59,31 @@ class HomeFragment : Fragment() {
         }
 
         if (contentView == null) {
-            val homeWeb: BarneyWebView = binding.homeWebview
-            Logger.log("onCreateView $homeWeb")
-            homeViewModel.url.observe(viewLifecycleOwner, Observer {
-                context?.run { ToastUtil.show(this, "loading $it") }
-                if (homeWeb.url != it) {
-                    Logger.log("loading url=$it replace ${homeWeb.url}")
-                    homeWeb.loadUrl(it)
+            val innerWeb: BarneyWebView = binding.homeWebview
+            Logger.log("onCreateView $innerWeb")
+            innerWeb.addWebChromeClient(object : WebChromeClient() {
+                val progress =
+                    (container?.parent as? ViewGroup)?.findViewById<BarneyLoadingView>(R.id.bar_percent_progress)
+
+                override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                    super.onProgressChanged(view, newProgress)
+                    checkNotNull(progress)
+                    progress.setPercentage(newProgress.toFloat())
+                    if (newProgress >= 100) {
+                        progress.visibility = View.GONE
+                    } else if (progress.visibility == View.GONE) {
+                        progress.visibility = View.VISIBLE
+                    }
                 }
             })
-            contentView = homeWeb
+            homeViewModel.url.observe(viewLifecycleOwner, Observer {
+//                context?.run { ToastUtil.show(this, "loading $it") }
+                if (innerWeb.url != it) {
+                    Logger.log("loading url=$it replace ${innerWeb.url}")
+                    innerWeb.loadUrl(it)
+                }
+            })
+            contentView = innerWeb
         } else if (contentView?.parent != null) {
             contentView!!.removeSelfFromParent()
             Logger.log("reuse $contentView")

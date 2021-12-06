@@ -8,7 +8,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import androidx.navigation.fragment.FragmentNavigator
-import com.hjhjw1991.barney.byh.util.Logger
+import com.hjhjw1991.barney.util.Logger
 
 /**
  * Fragment导航
