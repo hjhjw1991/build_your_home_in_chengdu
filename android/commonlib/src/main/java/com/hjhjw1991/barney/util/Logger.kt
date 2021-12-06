@@ -1,4 +1,4 @@
-package com.hjhjw1991.barney.byh.util
+package com.hjhjw1991.barney.util
 
 import android.util.Log
 
@@ -16,7 +16,7 @@ object Logger: ILogger {
     const val TAG = "BuildYourHome"
 
     private val _logger: ILogger
-        get() = loggerImpl?: localLogger
+        get() = loggerImpl ?: localLogger
 
     override fun log(str: String?) {
         _logger.log(str)

@@ -8,7 +8,11 @@ import android.view.View
 import androidx.annotation.Keep
 import com.hjhjw1991.barney.R
 
-class BarneyLoadingView: View {
+interface IBarneyLoadingView {
+    fun setPercentage(percentage: Float)
+}
+
+open class BarneyLoadingView: View, IBarneyLoadingView {
     private lateinit var rectFBg: RectF
     private lateinit var rectFProgress: RectF
     private lateinit var mPaint: Paint
@@ -114,7 +118,7 @@ class BarneyLoadingView: View {
     }
 
     @Keep
-    fun setPercentage(percentage: Float) {
+    override fun setPercentage(percentage: Float) {
         progressPercent = if (percentage / MAX >= 1) {
             1f
         } else {
