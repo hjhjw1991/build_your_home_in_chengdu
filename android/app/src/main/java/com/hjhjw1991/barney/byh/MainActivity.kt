@@ -12,6 +12,8 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.hjhjw1991.barney.byh.databinding.ActivityMainBinding
 import com.hjhjw1991.barney.byh.nav.FixFragmentNavigator
+import com.hjhjw1991.barney.byh.service.IAnotherService
+import com.hjhjw1991.barney.byh.service.IDemoService
 import com.hjhjw1991.barney.byh.ui.dashboard.DashboardFragment
 import com.hjhjw1991.barney.byh.ui.home.HomeFragment
 import com.hjhjw1991.barney.byh.ui.notifications.NotificationsFragment
@@ -57,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         ServiceManager.getService(IDemoService::class.java)?.sayHello(this)
+        ServiceManager.getService(IAnotherService::class.java)?.hahaha(this)
     }
 
     //手动创建导航图，把3个目的地添加进来

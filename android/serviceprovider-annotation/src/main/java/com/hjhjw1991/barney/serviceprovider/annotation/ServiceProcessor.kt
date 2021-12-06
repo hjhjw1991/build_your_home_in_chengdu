@@ -9,7 +9,6 @@ import com.sun.tools.javac.code.Symbol
 import com.sun.tools.javac.code.Type
 import com.sun.tools.javac.code.Types
 import com.sun.tools.javac.processing.JavacProcessingEnvironment
-import com.sun.tools.javac.tree.JCTree
 import com.sun.tools.javac.tree.TreeMaker
 import com.sun.tools.javac.util.Names
 import java.io.IOException
@@ -27,15 +26,10 @@ open class ServiceProcessor: AbstractProcessor() {
         const val SERVICE_IMPL = "com.hjhjw1991.barney.serviceprovider.annotation.ServiceImpl"
         const val SERVICE_PROXY = "ServiceManager_Proxy"
         val serviceMapConfig = mutableMapOf<Type, MutableSet<TypeElement>>()
-        val serviceMapConfigVK = mutableMapOf<TypeElement, Type>()
     }
     // apt 相关类
     protected val filer: Filer get() = EnvUtil.filer
 
-    // javac 编译器相关类
-    protected val trees: Trees get() = EnvUtil.trees
-
-    protected var rootTree: JCTree.JCCompilationUnit? = null
     private var packageName: String = ""
 
     override fun process(
@@ -61,68 +55,71 @@ open class ServiceProcessor: AbstractProcessor() {
         roundEnv.getElementsAnnotatedWith(ServiceImpl::class.java)
             .filterIsInstance<TypeElement>()
             .forEach { element ->
-                val treePath = trees.getPath(element)
-                val cu = treePath.compilationUnit as JCTree.JCCompilationUnit
-                rootTree = cu
-                println("process find class = $element, jcTree = ${cu.javaClass.simpleName}")
+                println("process find class = $element")
                 element.interfaces.filterIsInstance<Type>()
                     .find { it in serviceMapConfig }
                     ?.let {
                     serviceMapConfig[it]?.add(element)
-                    serviceMapConfigVK[element] = it
                 }
             }
 
         // todo 检查注解参数, 接口继承关系
         try {
-            serviceMapConfigVK.keys.forEach { element ->
-                val treePath = trees.getPath(element)
-                val cu = treePath.compilationUnit as JCTree.JCCompilationUnit
-                rootTree = cu
-            }
-
-            serviceMapConfig.keys.forEach { type ->
-                createJavaFileByJavaPoet(type, serviceMapConfig[type])
-            }
+            createJavaFileByJavaPoet()
         } catch (e: IOException) {
             e.printStackTrace()
         }
 
         println(serviceMapConfig)
-        println(serviceMapConfigVK)
         println("process end !!!")
         return true
     }
 
     // create generated class in app/build/generated/source/kapt/
-    private fun createJavaFileByJavaPoet(curInterface: Type, curElements: MutableSet<TypeElement>?) {
-        if (curElements.isNullOrEmpty()) {
-            return
-        }
-        val curElement = curElements.first()
+    private fun createJavaFileByJavaPoet() {
         /*
             public static final ConcurrentHashMap mServices = new ConcurrentHashMap<Class, Object>()
         */
-        val serviceField = FieldSpec.builder(ConcurrentHashMap::class.java, "mServices")
+        // field
+        val filedDesc = ParameterizedTypeName.get(ConcurrentHashMap::class.java, Class::class.java, Any::class.java)
+        val serviceField = FieldSpec.builder(filedDesc, "mServices")
             .addModifiers(Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL)
             .initializer(CodeBlock.of("new ConcurrentHashMap<Class, Object>()"))
             .build()
+        // method
         val init = MethodSpec.methodBuilder("init")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .returns(TypeName.VOID)
-            .addStatement("\$T.out.println(\$S)", System::class.java, curElement.simpleName)
+            .addStatement("\$T.out.println(\$S)", System::class.java, "hello spi")
             .build()
 
+        // initializer
         val initialize = mutableListOf<CodeBlock>()
-        initialize.add(CodeBlock.of(
-            "mServices.put(\$L.class, new \$L());", curInterface.tsym.simpleName, curElement.simpleName)
-        )
+        val format = "mServices.put(\$T.class, new \$T());"
+        if (serviceMapConfig.isNotEmpty()) {
+            serviceMapConfig.keys.forEach { curInterface ->
+                val curElement = serviceMapConfig[curInterface]
+                curElement.takeUnless {
+                    it.isNullOrEmpty()
+                }?.let {
+                    initialize.add(
+                        CodeBlock.of(
+                            format, TypeName.get(curInterface), TypeName.get(it.first().asType())
+                        )
+                    )
+                }
+            }
+        }
+
+        // java file
         val proxy = TypeSpec.classBuilder(SERVICE_PROXY)
             .addField(serviceField)
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-            .addStaticBlock(CodeBlock.join(
-                initialize,""
-            ))
+            .apply {
+                if (initialize.isNotEmpty()) {
+                    addStaticBlock(CodeBlock.join(initialize, "\n"))
+                }
+            }
             .addMethod(init)
             .build()
         val javaFile = JavaFile.builder(packageName, proxy).build()
@@ -144,7 +141,7 @@ open class ServiceProcessor: AbstractProcessor() {
     override fun init(processingEnv: ProcessingEnvironment) {
         super.init(processingEnv)
         println("HJSPI init module: " + processingEnv.options["MODULE_NAME"])
-        println("HJSPI init module: " + processingEnv.options["MODULE_NAME"])
+        println("HJSPI init module: " + processingEnv.options["PACKAGE_NAME"])
         packageName = processingEnv.options["PACKAGE_NAME"].orEmpty()
         EnvUtil.init(processingEnv)
     }
