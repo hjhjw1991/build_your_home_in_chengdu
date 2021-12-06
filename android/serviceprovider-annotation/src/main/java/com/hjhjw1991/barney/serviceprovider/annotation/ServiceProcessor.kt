@@ -4,21 +4,16 @@ package com.hjhjw1991.barney.serviceprovider.annotation
 import com.hjhjw1991.barney.serviceprovider.annotation.ServiceProcessor.Companion.SERVICE_IMPL
 import com.hjhjw1991.barney.serviceprovider.annotation.ServiceProcessor.Companion.SERVICE_SPI
 import com.squareup.javapoet.*
-import com.sun.source.tree.Tree
 import com.sun.source.util.Trees
-import com.sun.tools.javac.code.Flags
 import com.sun.tools.javac.code.Symbol
 import com.sun.tools.javac.code.Type
 import com.sun.tools.javac.code.Types
 import com.sun.tools.javac.processing.JavacProcessingEnvironment
 import com.sun.tools.javac.tree.JCTree
 import com.sun.tools.javac.tree.TreeMaker
-import com.sun.tools.javac.tree.TreeTranslator
-import com.sun.tools.javac.util.List as JList
-import com.sun.tools.javac.util.ListBuffer
-import com.sun.tools.javac.util.Name
 import com.sun.tools.javac.util.Names
 import java.io.IOException
+import java.util.concurrent.ConcurrentHashMap
 import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Modifier
@@ -26,26 +21,22 @@ import javax.lang.model.element.TypeElement
 import javax.lang.model.util.Elements
 
 @SupportedAnnotationTypes(SERVICE_SPI, SERVICE_IMPL)
-class ServiceProcessor: AbstractProcessor() {
+open class ServiceProcessor: AbstractProcessor() {
     companion object {
         const val SERVICE_SPI = "com.hjhjw1991.barney.serviceprovider.annotation.ServiceInterface"
         const val SERVICE_IMPL = "com.hjhjw1991.barney.serviceprovider.annotation.ServiceImpl"
         const val SERVICE_PROXY = "ServiceManager_Proxy"
-        val serviceMapConfig = mutableMapOf<Type, MutableSet<String>>()
+        val serviceMapConfig = mutableMapOf<Type, MutableSet<TypeElement>>()
+        val serviceMapConfigVK = mutableMapOf<TypeElement, Type>()
     }
     // apt 相关类
     protected val filer: Filer get() = EnvUtil.filer
-    protected val elements: Elements get() = EnvUtil.elements
-    protected val messager: Messager get() = EnvUtil.messager
 
     // javac 编译器相关类
     protected val trees: Trees get() = EnvUtil.trees
-    protected val treeMaker: TreeMaker get() = EnvUtil.treeMaker
-    protected val names: Names get() = EnvUtil.names
-
-    private var mFields: MutableList<JCTree.JCVariableDecl> = JList.nil()
 
     protected var rootTree: JCTree.JCCompilationUnit? = null
+    private var packageName: String = ""
 
     override fun process(
         annotations: MutableSet<out TypeElement>?,
@@ -58,12 +49,15 @@ class ServiceProcessor: AbstractProcessor() {
         println("HJSPI process")
         println("process begin !!! set = $annotations")
 
+        // 获取所有ServiceInterface标记的接口
         roundEnv.getElementsAnnotatedWith(ServiceInterface::class.java)
             .filterIsInstance<TypeElement>()
             .forEach { element ->
                 println("process find interface = $element")
                 serviceMapConfig[(element as Symbol).type] = mutableSetOf()
             }
+
+        // 获取所有ServiceImpl标记的类
         roundEnv.getElementsAnnotatedWith(ServiceImpl::class.java)
             .filterIsInstance<TypeElement>()
             .forEach { element ->
@@ -74,65 +68,61 @@ class ServiceProcessor: AbstractProcessor() {
                 element.interfaces.filterIsInstance<Type>()
                     .find { it in serviceMapConfig }
                     ?.let {
-                    serviceMapConfig[it]?.add(element.qualifiedName.toString())
-                }
-                translate(element, trees.getTree(element) as JCTree)
-
-                try {
-                    generateJavaFile(element, trees.getTree(element) as JCTree)
-                } catch (e: IOException) {
-                    e.printStackTrace()
+                    serviceMapConfig[it]?.add(element)
+                    serviceMapConfigVK[element] = it
                 }
             }
 
+        // todo 检查注解参数, 接口继承关系
+        try {
+            serviceMapConfigVK.keys.forEach { element ->
+                val treePath = trees.getPath(element)
+                val cu = treePath.compilationUnit as JCTree.JCCompilationUnit
+                rootTree = cu
+            }
+
+            serviceMapConfig.keys.forEach { type ->
+                createJavaFileByJavaPoet(type, serviceMapConfig[type])
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
         println(serviceMapConfig)
+        println(serviceMapConfigVK)
         println("process end !!!")
         return true
     }
 
-    fun translate(curElement: TypeElement, curTree: JCTree) {
-        println("translate")
-        curTree.accept(MyTreeTranslator(curElement.simpleName as Name))
-    }
-
-    @Throws(IOException::class)
-    fun generateJavaFile(curElement: TypeElement, curTree: JCTree) {
-        println("generateJavaFile")
-        getJavaFile(curElement).writeTo(filer)
-        getJavaFileByJavaPoet(curElement, curTree)
-    }
-
-    fun getJavaFile(curElement: TypeElement): JavaFile {
-        val packageName = rootTree?.packageName?.toString() ?: ""
-
-        val curIGetter = TypeSpec.interfaceBuilder("${curElement.qualifiedName.substring(packageName.length + 1).replace(".", "$$")}\$\$IGetter")
-            .addModifiers(Modifier.PUBLIC)
-            .apply {
-                mFields.forEach {
-                    this.addMethod(
-                        MethodSpec.methodBuilder(it.name.toString())
-                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .returns(ClassName.get(it.sym.asType()))
-                        .build()
-                    )
-                }
-            }
+    // create generated class in app/build/generated/source/kapt/
+    private fun createJavaFileByJavaPoet(curInterface: Type, curElements: MutableSet<TypeElement>?) {
+        if (curElements.isNullOrEmpty()) {
+            return
+        }
+        val curElement = curElements.first()
+        /*
+            public static final ConcurrentHashMap mServices = new ConcurrentHashMap<Class, Object>()
+        */
+        val serviceField = FieldSpec.builder(ConcurrentHashMap::class.java, "mServices")
+            .addModifiers(Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL)
+            .initializer(CodeBlock.of("new ConcurrentHashMap<Class, Object>()"))
             .build()
-
-        return JavaFile.builder(packageName, curIGetter)
-            .build()
-    }
-
-    // get generated class in app/build/intermediates/javac/package_name/
-    fun getJavaFileByJavaPoet(curElement: TypeElement, curTree: JCTree) {
-        val packageName = rootTree?.packageName?.toString() ?: ""
         val init = MethodSpec.methodBuilder("init")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .returns(TypeName.VOID)
             .addStatement("\$T.out.println(\$S)", System::class.java, curElement.simpleName)
             .build()
+
+        val initialize = mutableListOf<CodeBlock>()
+        initialize.add(CodeBlock.of(
+            "mServices.put(\$L.class, new \$L());", curInterface.tsym.simpleName, curElement.simpleName)
+        )
         val proxy = TypeSpec.classBuilder(SERVICE_PROXY)
+            .addField(serviceField)
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+            .addStaticBlock(CodeBlock.join(
+                initialize,""
+            ))
             .addMethod(init)
             .build()
         val javaFile = JavaFile.builder(packageName, proxy).build()
@@ -154,41 +144,9 @@ class ServiceProcessor: AbstractProcessor() {
     override fun init(processingEnv: ProcessingEnvironment) {
         super.init(processingEnv)
         println("HJSPI init module: " + processingEnv.options["MODULE_NAME"])
+        println("HJSPI init module: " + processingEnv.options["MODULE_NAME"])
+        packageName = processingEnv.options["PACKAGE_NAME"].orEmpty()
         EnvUtil.init(processingEnv)
-    }
-
-    inner class MyTreeTranslator(private val rootClazzName: Name) : TreeTranslator() {
-        override fun visitClassDef(jcClassDecl: JCTree.JCClassDecl) {
-            if (jcClassDecl.name == rootClazzName) {
-                mFields = JList.nil()
-                jcClassDecl.defs
-                    .filter { it.kind == Tree.Kind.VARIABLE }
-                    .map { it as JCTree.JCVariableDecl }
-                    .forEach {
-                        mFields.add(it)
-                        jcClassDecl.defs.add(makeGetterMethodDecl(it))
-                    }
-            }
-            super.visitClassDef(jcClassDecl)
-        }
-
-        /**
-         *   public String getName() {
-         *      return this.name;
-         *   }
-         */
-        private fun makeGetterMethodDecl(jcVariableDecl: JCTree.JCVariableDecl): JCTree.JCMethodDecl {
-            val body = ListBuffer<JCTree.JCStatement>()
-                .append(treeMaker.Return(treeMaker.Select(treeMaker.Ident(names._this), jcVariableDecl.getName())))
-                .toList()
-                .let { treeMaker.Block(0, it) }
-
-            return treeMaker.MethodDef(
-                treeMaker.Modifiers(Flags.PUBLIC.toLong()),
-                names.fromString(jcVariableDecl.getName().toString()),
-                jcVariableDecl.vartype,
-                JList.nil(), JList.nil(), JList.nil(), body, null)
-        }
     }
 }
 

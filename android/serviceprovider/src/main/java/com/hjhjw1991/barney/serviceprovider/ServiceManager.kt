@@ -8,6 +8,10 @@ object ServiceManager {
     var serviceMap: ConcurrentHashMap<Class<*>, Any> = ConcurrentHashMap()
     var servicesMap: ConcurrentHashMap<Class<*>, Set<*>> = ConcurrentHashMap()
 
+    fun init(outServiceMap: ConcurrentHashMap<Class<*>, Any>) {
+        this.serviceMap.putAll(outServiceMap)
+    }
+
     fun <T> getService(clazz: Class<out T>): T? {
         var instance: T? = serviceMap[clazz] as? T
         if (instance == null) {

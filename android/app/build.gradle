@@ -8,7 +8,7 @@ android {
         applicationId "com.hjhjw1991.barney.byh"
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments = [MODULE_NAME: "module is " + project.name]
+                arguments = [MODULE_NAME: "module is " + project.name, "PACKAGE_NAME": applicationId]
             }
         }
     }

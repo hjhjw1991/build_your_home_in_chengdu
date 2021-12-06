@@ -6,6 +6,7 @@ import com.hjhjw1991.barney.util.showToast
 import com.hjhjw1991.barney.serviceprovider.ServiceManager
 import com.hjhjw1991.barney.serviceprovider.annotation.ServiceImpl
 import com.hjhjw1991.barney.serviceprovider.annotation.ServiceInterface
+import java.util.concurrent.ConcurrentHashMap
 
 class MainApplication: Application() {
     override fun onCreate() {
@@ -14,7 +15,8 @@ class MainApplication: Application() {
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
-        ServiceManager.bindService(IDemoService::class.java, DemoService())
+        // 初始化SPI
+        ServiceManager.init(ServiceManager_Proxy.mServices as ConcurrentHashMap<Class<*>, Any>)
     }
 }
 
