@@ -65,9 +65,7 @@ open class ServiceProcessor: AbstractProcessor() {
 
         // todo 检查注解参数, 接口继承关系
         try {
-            serviceMapConfig.keys.forEach { type ->
-                createJavaFileByJavaPoet(type, serviceMapConfig[type])
-            }
+            createJavaFileByJavaPoet()
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -78,34 +76,50 @@ open class ServiceProcessor: AbstractProcessor() {
     }
 
     // create generated class in app/build/generated/source/kapt/
-    private fun createJavaFileByJavaPoet(curInterface: Type, curElements: MutableSet<TypeElement>?) {
-        if (curElements.isNullOrEmpty()) {
-            return
-        }
-        val curElement = curElements.first()
+    private fun createJavaFileByJavaPoet() {
         /*
             public static final ConcurrentHashMap mServices = new ConcurrentHashMap<Class, Object>()
         */
-        val serviceField = FieldSpec.builder(ConcurrentHashMap::class.java, "mServices")
+        // field
+        val filedDesc = ParameterizedTypeName.get(ConcurrentHashMap::class.java, Class::class.java, Any::class.java)
+        val serviceField = FieldSpec.builder(filedDesc, "mServices")
             .addModifiers(Modifier.STATIC, Modifier.PUBLIC, Modifier.FINAL)
             .initializer(CodeBlock.of("new ConcurrentHashMap<Class, Object>()"))
             .build()
+        // method
         val init = MethodSpec.methodBuilder("init")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .returns(TypeName.VOID)
-            .addStatement("\$T.out.println(\$S)", System::class.java, curElement.simpleName)
+            .addStatement("\$T.out.println(\$S)", System::class.java, "hello spi")
             .build()
 
+        // initializer
         val initialize = mutableListOf<CodeBlock>()
-        initialize.add(CodeBlock.of(
-            "mServices.put(\$L.class, new \$L());", curInterface.tsym.simpleName, curElement.simpleName)
-        )
+        val format = "mServices.put(\$T.class, new \$T());"
+        if (serviceMapConfig.isNotEmpty()) {
+            serviceMapConfig.keys.forEach { curInterface ->
+                val curElement = serviceMapConfig[curInterface]
+                curElement.takeUnless {
+                    it.isNullOrEmpty()
+                }?.let {
+                    initialize.add(
+                        CodeBlock.of(
+                            format, TypeName.get(curInterface), TypeName.get(it.first().asType())
+                        )
+                    )
+                }
+            }
+        }
+
+        // java file
         val proxy = TypeSpec.classBuilder(SERVICE_PROXY)
             .addField(serviceField)
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-            .addStaticBlock(CodeBlock.join(
-                initialize,""
-            ))
+            .apply {
+                if (initialize.isNotEmpty()) {
+                    addStaticBlock(CodeBlock.join(initialize, "\n"))
+                }
+            }
             .addMethod(init)
             .build()
         val javaFile = JavaFile.builder(packageName, proxy).build()
