@@ -1,4 +1,4 @@
-package com.hjhjw1991.barney.ui
+package com.hjhjw1991.barney.loading.ui
 
 import android.content.Context
 import android.content.res.TypedArray

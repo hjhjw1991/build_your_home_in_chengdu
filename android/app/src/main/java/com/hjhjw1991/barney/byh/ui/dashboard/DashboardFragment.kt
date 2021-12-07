@@ -8,7 +8,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.hjhjw1991.barney.ui.BarneyLoadingView
+import com.hjhjw1991.barney.loading.ui.BarneyLoadingView
 import com.hjhjw1991.barney.byh.R
 import com.hjhjw1991.barney.byh.databinding.FragmentDashboardBinding
 import com.hjhjw1991.barney.byh.ui.BarneyWebView
