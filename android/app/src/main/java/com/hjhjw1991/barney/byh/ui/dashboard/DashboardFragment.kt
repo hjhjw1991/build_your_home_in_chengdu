@@ -44,7 +44,7 @@ class DashboardFragment : Fragment() {
             rootView = binding.root
             Logger.log("create $rootView")
         } else {
-            rootView!!.removeSelfFromParent()
+            rootView.removeSelfFromParent()
             Logger.log("reuse $rootView")
         }
 
@@ -57,11 +57,13 @@ class DashboardFragment : Fragment() {
 
                 override fun onProgressChanged(view: WebView?, newProgress: Int) {
                     super.onProgressChanged(view, newProgress)
-                    progress?.setPercentage(newProgress.toFloat())
-                    if (newProgress >= 100) {
-                        progress?.visibility = View.GONE
-                    } else if (progress?.visibility == View.GONE) {
-                        progress?.visibility = View.VISIBLE
+                    progress?.apply {
+                        setPercentage(newProgress.toFloat())
+                        if (newProgress >= 100) {
+                            visibility = View.GONE
+                        } else if (visibility == View.GONE) {
+                            visibility = View.VISIBLE
+                        }
                     }
                 }
             })
@@ -74,7 +76,7 @@ class DashboardFragment : Fragment() {
             })
             contentView = innerWeb
         } else if (contentView?.parent != null) {
-            contentView!!.removeSelfFromParent()
+            contentView.removeSelfFromParent()
             Logger.log("reuse $contentView")
         }
         return rootView

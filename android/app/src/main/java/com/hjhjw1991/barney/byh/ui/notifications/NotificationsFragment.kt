@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.hjhjw1991.barney.byh.R
 import com.hjhjw1991.barney.byh.databinding.FragmentNotificationsBinding
 
 /**
@@ -27,7 +26,7 @@ class NotificationsFragment : Fragment() {
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         notificationsViewModel =
                 ViewModelProvider(this).get(NotificationsViewModel::class.java)
 
