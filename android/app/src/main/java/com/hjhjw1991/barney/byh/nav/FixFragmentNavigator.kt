@@ -79,26 +79,29 @@ class FixFragmentNavigator(
                 && navOptions.shouldLaunchSingleTop()
                 && mBackStack.last() == destId)
 
-        val isAdded: Boolean
-        isAdded = if (initialNavigation) {
-            true
-        } else if (isSingleTopReplacement) {
-            // Single Top means we only want one instance on the back stack
-            if (mBackStack.size > 1) {
-                // If the Fragment to be replaced is on the FragmentManager's
-                // back stack, a simple replace() isn't enough so we
-                // remove it from the back stack and put our replacement
-                // on the back stack in its place
-                manager.popBackStack(
-                    generateBackStackName(mBackStack.size, mBackStack.last()),
-                    FragmentManager.POP_BACK_STACK_INCLUSIVE
-                )
-                ft.addToBackStack(generateBackStackName(mBackStack.size, destId))
+        val isAdded: Boolean = when {
+            initialNavigation -> {
+                true
             }
-            false
-        } else {
-            ft.addToBackStack(generateBackStackName(mBackStack.size + 1, destId))
-            true
+            isSingleTopReplacement -> {
+                // Single Top means we only want one instance on the back stack
+                if (mBackStack.size > 1) {
+                    // If the Fragment to be replaced is on the FragmentManager's
+                    // back stack, a simple replace() isn't enough so we
+                    // remove it from the back stack and put our replacement
+                    // on the back stack in its place
+                    manager.popBackStack(
+                        generateBackStackName(mBackStack.size, mBackStack.last()),
+                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+                    )
+                    ft.addToBackStack(generateBackStackName(mBackStack.size, destId))
+                }
+                false
+            }
+            else -> {
+                ft.addToBackStack(generateBackStackName(mBackStack.size + 1, destId))
+                true
+            }
         }
         if (navigatorExtras is Extras) {
             for ((key, value) in navigatorExtras.sharedElements) {
@@ -107,7 +110,6 @@ class FixFragmentNavigator(
         }
         ft.setReorderingAllowed(true)
         ft.commit()
-        // The commit succeeded, update our view of the world
         // The commit succeeded, update our view of the world
         return if (isAdded) {
             mBackStack.add(destId)

@@ -15,8 +15,17 @@ interface ILogger {
 object Logger: ILogger {
     const val TAG = "BuildYourHome"
 
-    private val _logger: ILogger
-        get() = loggerImpl ?: localLogger
+    private val localLogger = object: ILogger {
+        override fun log(str: String?) {
+            log(TAG, str.orEmpty())
+        }
+
+        override fun log(tag: String, str: String?) {
+            Log.d(tag, str.orEmpty())
+        }
+    }
+
+    private var _logger: ILogger = localLogger
 
     override fun log(str: String?) {
         _logger.log(str)
@@ -26,19 +35,7 @@ object Logger: ILogger {
         _logger.log(tag, str)
     }
 
-    private val localLogger = object: ILogger {
-        override fun log(str: String?) {
-            Log.d(TAG, str.orEmpty())
-        }
-
-        override fun log(tag: String, str: String?) {
-            Log.d(tag, str.orEmpty())
-        }
-    }
-
-    private var loggerImpl: ILogger? = null
-
     fun setLogger(log: ILogger) {
-        loggerImpl = log
+        _logger = log
     }
 }
