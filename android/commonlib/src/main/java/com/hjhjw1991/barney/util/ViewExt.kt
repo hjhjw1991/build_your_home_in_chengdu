@@ -4,11 +4,13 @@ import android.view.View
 import android.view.ViewGroup
 
 /**
+ * View Extension
  * @author huangjun.barney
  * @since 2021/2/6
  */
 
-fun View.removeSelfFromParent() {
+fun View?.removeSelfFromParent() {
+    if (this == null) return
     (this.parent as? ViewGroup)?.removeView(this)
 }
 

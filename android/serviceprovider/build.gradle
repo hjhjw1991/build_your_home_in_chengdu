@@ -7,6 +7,3 @@ android {
 
 dependencies {
 }
-// todo 服务发现, 服务注册
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"

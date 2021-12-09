@@ -25,6 +25,5 @@ afterEvaluate {
     }
 }
 
-// todo 服务注解处理
 sourceCompatibility = "8"
 targetCompatibility = "8"
