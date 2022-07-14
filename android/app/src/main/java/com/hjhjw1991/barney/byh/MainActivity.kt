@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity() {
 
         ServiceManager.getService(IDemoService::class.java)?.sayHello(this)
         ServiceManager.getService(IAnotherService::class.java)?.hahaha(this)
+        Test.test()
     }
 
     //手动创建导航图，把3个目的地添加进来

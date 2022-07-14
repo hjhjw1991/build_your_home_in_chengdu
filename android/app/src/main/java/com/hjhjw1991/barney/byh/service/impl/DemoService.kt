@@ -19,3 +19,9 @@ class AnotherService: IAnotherService {
         context.showToast("hahaha this is $context")
     }
 }
+
+abstract class NothingListener {
+
+}
+
+class FragmentTest(var param: String?, var par2: Context): NothingListener()

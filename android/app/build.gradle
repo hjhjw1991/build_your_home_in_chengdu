@@ -2,6 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply from: rootProject.file('gradle/dependency/commonlib.gradle')
+// 应用 com.sensorsdata.analytics.android 插件
+apply plugin: 'com.sensorsdata.analytics.android'
 
 android {
     defaultConfig {
@@ -12,6 +14,12 @@ android {
             }
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    compileSdk 29
+    buildToolsVersion '29.0.3'
 }
 
 dependencies {
@@ -19,6 +27,9 @@ dependencies {
     implementation project(":serviceprovider")
     implementation project(":serviceprovider-annotation")
     kapt project(":serviceprovider-annotation")
+
+    // 添加 Sensors Analytics SDK 依赖
+    implementation 'com.sensorsdata.analytics.android:SensorsAnalyticsSDK:6.3.5'
 }
 
 project.afterEvaluate {
