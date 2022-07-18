@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">建设家</string>
-    <string name="title_home">购房</string>
-    <string name="title_dashboard">装修</string>
-    <string name="title_notifications">消息</string>
+    <string name="title_buy">购房</string>
+    <string name="title_furnish">装修</string>
+    <string name="title_message">消息</string>
 </resources>

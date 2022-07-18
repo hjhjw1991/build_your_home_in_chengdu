@@ -19,7 +19,6 @@ open class BarneyPullRefreshLayout(private val ctx: Context, attrs: AttributeSet
     SwipeRefreshLayout(ctx, attrs), IRefreshable<BarneyItem> {
     override fun refresh(t: List<BarneyItem>) {
         Logger.log("updating $t")
-
     }
 }
 

@@ -14,9 +14,9 @@ import com.hjhjw1991.barney.byh.databinding.ActivityMainBinding
 import com.hjhjw1991.barney.byh.nav.FixFragmentNavigator
 import com.hjhjw1991.barney.byh.service.IAnotherService
 import com.hjhjw1991.barney.byh.service.IDemoService
-import com.hjhjw1991.barney.byh.ui.dashboard.DashboardFragment
-import com.hjhjw1991.barney.byh.ui.home.HomeFragment
-import com.hjhjw1991.barney.byh.ui.notifications.NotificationsFragment
+import com.hjhjw1991.barney.byh.ui.buyhome.BuyHomeFragment
+import com.hjhjw1991.barney.byh.ui.furnish.FurnishFragment
+import com.hjhjw1991.barney.byh.ui.message.MessageFragment
 import com.hjhjw1991.barney.serviceprovider.ServiceManager
 
 /**
@@ -73,20 +73,20 @@ class MainActivity : AppCompatActivity() {
         //用自定义的导航器来创建目的地
         val destination1 = fragmentNavigator.createDestination()
         destination1.id = R.id.navigation_home
-        destination1.className = HomeFragment::class.java.canonicalName.orEmpty()
-        destination1.label = resources.getString(R.string.title_home)
+        destination1.className = BuyHomeFragment::class.java.canonicalName.orEmpty()
+        destination1.label = resources.getString(R.string.title_buy)
         navGraph.addDestination(destination1)
 
         val destination2 = fragmentNavigator.createDestination()
         destination2.id = R.id.navigation_dashboard
-        destination2.className = DashboardFragment::class.java.canonicalName.orEmpty()
-        destination2.label = resources.getString(R.string.title_dashboard)
+        destination2.className = FurnishFragment::class.java.canonicalName.orEmpty()
+        destination2.label = resources.getString(R.string.title_furnish)
         navGraph.addDestination(destination2)
 
         val destination3 = fragmentNavigator.createDestination()
         destination3.id = R.id.navigation_notifications
-        destination3.className = NotificationsFragment::class.java.canonicalName.orEmpty()
-        destination3.label = resources.getString(R.string.title_notifications)
+        destination3.className = MessageFragment::class.java.canonicalName.orEmpty()
+        destination3.label = resources.getString(R.string.title_message)
         navGraph.addDestination(destination3)
 
         navGraph.startDestination = R.id.navigation_home

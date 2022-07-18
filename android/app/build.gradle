@@ -13,13 +13,12 @@ android {
                 arguments = [MODULE_NAME: "module is " + project.name, "PACKAGE_NAME": applicationId]
             }
         }
+        sourceSets {
+            debug {
+                java.srcDirs = ['src/main/java', 'build/generated/data_binding_base_class_source_out/debug/out']
+            }
+        }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    compileSdk 29
-    buildToolsVersion '29.0.3'
 }
 
 dependencies {

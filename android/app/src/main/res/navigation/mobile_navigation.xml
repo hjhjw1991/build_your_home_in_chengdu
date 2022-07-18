@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.hjhjw1991.barney.byh.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:name="com.hjhjw1991.barney.byh.ui.buyhome.BuyHomeFragment"
+        android:label="@string/title_buy"
+        tools:layout="@layout/fragment_buyhome" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.hjhjw1991.barney.byh.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:name="com.hjhjw1991.barney.byh.ui.furnish.FurnishFragment"
+        android:label="@string/title_furnish"
+        tools:layout="@layout/fragment_furnish" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.hjhjw1991.barney.byh.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:name="com.hjhjw1991.barney.byh.ui.message.MessageFragment"
+        android:label="@string/title_message"
+        tools:layout="@layout/fragment_message" />
 </navigation>
