@@ -12,6 +12,7 @@ class MainApplication: Application() {
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
         // 初始化SPI
+        ServiceManager_Proxy.init()
         ServiceManager.init(ServiceManager_Proxy.mServices)
     }
 }

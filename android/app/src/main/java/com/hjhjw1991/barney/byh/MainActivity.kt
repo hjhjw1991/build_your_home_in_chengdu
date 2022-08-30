@@ -12,7 +12,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.hjhjw1991.barney.byh.databinding.ActivityMainBinding
 import com.hjhjw1991.barney.byh.nav.FixFragmentNavigator
-import com.hjhjw1991.barney.byh.service.IAnotherService
+import com.hjhjw1991.barney.byh.service.IKeyMomentLog
 import com.hjhjw1991.barney.byh.service.IDemoService
 import com.hjhjw1991.barney.byh.ui.buyhome.BuyHomeFragment
 import com.hjhjw1991.barney.byh.ui.furnish.FurnishFragment
@@ -59,7 +59,9 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         ServiceManager.getService(IDemoService::class.java)?.sayHello(this)
-        ServiceManager.getService(IAnotherService::class.java)?.hahaha(this)
+        ServiceManager.getService(IKeyMomentLog::class.java)?.recordKeyMoment(IKeyMomentLog.KeyMoment().apply {
+            frame = "MainActivity onCreate"
+        })
         Test.test()
     }
 

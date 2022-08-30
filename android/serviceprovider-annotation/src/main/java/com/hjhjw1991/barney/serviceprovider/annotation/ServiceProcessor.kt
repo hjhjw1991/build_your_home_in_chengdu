@@ -90,7 +90,7 @@ open class ServiceProcessor: AbstractProcessor() {
         val init = MethodSpec.methodBuilder("init")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .returns(TypeName.VOID)
-            .addStatement("\$T.out.println(\$S)", System::class.java, "hello spi")
+            .addStatement("\$T.out.println(\$S)", System::class.java, "SPI initialized")
             .build()
 
         // initializer
